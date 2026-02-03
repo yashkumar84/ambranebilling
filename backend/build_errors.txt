@@ -1,0 +1,41 @@
+src/modules/orders/controllers/order.controller.ts(6,1): error TS6133: 'PaginationDTO' is declared but its value is never read.
+src/modules/orders/controllers/order.controller.ts(24,39): error TS6133: 'status' is declared but its value is never read.
+src/modules/orders/controllers/order.controller.ts(24,47): error TS6133: 'tableId' is declared but its value is never read.
+src/modules/orders/controllers/order.controller.ts(25,15): error TS6133: 'restaurantId' is declared but its value is never read.
+src/modules/payments/controllers/payment.controller.ts(21,62): error TS2345: Argument of type 'PaginationDTO' is not assignable to parameter of type 'string'.
+src/modules/payments/controllers/payment.controller.ts(30,51): error TS2554: Expected 2 arguments, but got 1.
+src/modules/payments/controllers/payment.controller.ts(36,51): error TS2554: Expected 2 arguments, but got 1.
+src/modules/permissions/controllers/permission.controller.ts(23,53): error TS2551: Property 'getPermissions' does not exist on type 'PermissionService'. Did you mean 'getAllPermissions'?
+src/modules/permissions/controllers/permission.controller.ts(30,57): error TS2551: Property 'getPermission' does not exist on type 'PermissionService'. Did you mean 'getAllPermissions'?
+src/modules/permissions/controllers/permission.controller.ts(42,55): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+src/modules/permissions/controllers/permission.controller.ts(47,56): error TS2339: Property 'getResources' does not exist on type 'PermissionService'.
+src/modules/roles/controllers/role.controller.ts(26,47): error TS2339: Property 'getRoles' does not exist on type 'RoleService'.
+src/modules/roles/controllers/role.controller.ts(33,45): error TS2339: Property 'getRole' does not exist on type 'RoleService'.
+src/modules/roles/controllers/role.controller.ts(39,45): error TS2339: Property 'createRole' does not exist on type 'RoleService'.
+src/modules/roles/controllers/role.controller.ts(46,45): error TS2339: Property 'updateRole' does not exist on type 'RoleService'.
+src/modules/roles/controllers/role.controller.ts(52,32): error TS2339: Property 'deleteRole' does not exist on type 'RoleService'.
+src/modules/roles/controllers/role.controller.ts(59,45): error TS2554: Expected 3 arguments, but got 2.
+src/modules/roles/controllers/role.controller.ts(65,45): error TS2339: Property 'removePermission' does not exist on type 'RoleService'.
+src/modules/roles/repositories/role.repository.ts(22,22): error TS2322: Type 'number' is not assignable to type 'string | (RoleTenantIdNameCompoundUniqueInput & string) | undefined'.
+src/modules/roles/repositories/role.repository.ts(48,22): error TS2322: Type 'number' is not assignable to type 'string | (RoleTenantIdNameCompoundUniqueInput & string) | undefined'.
+src/modules/roles/repositories/role.repository.ts(62,22): error TS2322: Type 'number' is not assignable to type 'string | (RoleTenantIdNameCompoundUniqueInput & string) | undefined'.
+src/modules/roles/repositories/role.repository.ts(69,22): error TS2322: Type 'number' is not assignable to type 'string | StringFilter<"RolePermission"> | undefined'.
+src/modules/roles/repositories/role.repository.ts(74,13): error TS2322: Type '{ roleId: number; permissionId: any; }[]' is not assignable to type 'RolePermissionCreateManyInput | RolePermissionCreateManyInput[]'.
+  Type '{ roleId: number; permissionId: any; }[]' is not assignable to type 'RolePermissionCreateManyInput[]'.
+    Type '{ roleId: number; permissionId: any; }' is not assignable to type 'RolePermissionCreateManyInput'.
+      Types of property 'roleId' are incompatible.
+        Type 'number' is not assignable to type 'string'.
+src/modules/roles/repositories/role.repository.ts(86,17): error TS2322: Type 'number' is not assignable to type 'string | StringFilter<"RolePermission"> | undefined'.
+src/modules/roles/repositories/role.repository.ts(87,17): error TS2322: Type 'number' is not assignable to type 'string | StringFilter<"RolePermission"> | undefined'.
+src/modules/super-admin/routes/super-admin.routes.ts(4,1): error TS6133: 'tenantIsolationMiddleware' is declared but its value is never read.
+src/modules/super-admin/routes/super-admin.routes.ts(421,34): error TS6133: 'request' is declared but its value is never read.
+src/modules/super-admin/routes/super-admin.routes.ts(489,38): error TS6133: 'request' is declared but its value is never read.
+src/modules/tables/repositories/table.repository.ts(14,17): error TS2353: Object literal may only specify known properties, and 'restaurantId' does not exist in type 'TableWhereInput'.
+src/modules/tables/repositories/table.repository.ts(25,22): error TS2322: Type 'number' is not assignable to type 'string | (TableTenantIdNumberCompoundUniqueInput & string) | undefined'.
+src/modules/tables/repositories/table.repository.ts(38,13): error TS2322: Type '{ number: string; capacity: number; restaurantId: number; }' is not assignable to type '(Without<TableCreateInput, TableUncheckedCreateInput> & TableUncheckedCreateInput) | (Without<...> & TableCreateInput)'.
+  Type '{ number: string; capacity: number; restaurantId: number; }' is not assignable to type 'Without<TableUncheckedCreateInput, TableCreateInput> & TableCreateInput'.
+    Property 'tenant' is missing in type '{ number: string; capacity: number; restaurantId: number; }' but required in type 'TableCreateInput'.
+src/modules/tables/repositories/table.repository.ts(44,22): error TS2322: Type 'number' is not assignable to type 'string | (TableTenantIdNumberCompoundUniqueInput & string) | undefined'.
+src/modules/tables/repositories/table.repository.ts(51,22): error TS2322: Type 'number' is not assignable to type 'string | (TableTenantIdNumberCompoundUniqueInput & string) | undefined'.
+src/modules/tables/repositories/table.repository.ts(58,17): error TS2353: Object literal may only specify known properties, and 'restaurantId' does not exist in type 'TableWhereInput'.
+src/modules/tables/repositories/table.repository.ts(66,22): error TS2322: Type 'number' is not assignable to type 'string | (TableTenantIdNumberCompoundUniqueInput & string) | undefined'.

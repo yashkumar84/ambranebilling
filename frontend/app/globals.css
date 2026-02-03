@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+/* Base variables with fallbacks */
+:root {
+  /* Default fallbacks (will be overwritten by applyTheme) */
+  --primary: 182 45% 42%;
+  --primary-light: 182 35% 71%;
+  --secondary: 217 38% 38%;
+  --secondary-light: 217 28% 62%;
+  --accent: 0 47% 68%;
+  --accent-light: 0 47% 90%;
+
+  --color-background: #ffffff;
+  --color-foreground: #020617;
+  --color-card: #ffffff;
+  --color-card-foreground: #020617;
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
+  --color-ring: hsl(var(--primary));
+  --color-muted: #f8fafc;
+  --color-muted-foreground: #334155;
+}
+
+/* Theme Variables for Tailwind v4 */
+@theme {
+  --color-primary: hsl(var(--primary));
+  --color-primary-light: hsl(var(--primary-light));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-light: hsl(var(--secondary-light));
+  --color-accent: hsl(var(--accent));
+  --color-accent-light: hsl(var(--accent-light));
+
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-card: var(--color-card);
+  --color-card-foreground: var(--color-card-foreground);
+  --color-border: var(--color-border);
+  --color-input: var(--color-input);
+  --color-ring: hsl(var(--primary));
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+
+  /* Destructive */
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  /* Radius */
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+}
+
+
+/* Custom Utility Classes */
+@layer utilities {
+
+  /* Gradient backgrounds */
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-light)) 100%);
+    box-shadow: 0 10px 40px -10px color-mix(in srgb, hsl(var(--primary)) 40%, transparent);
+  }
+
+  .gradient-secondary {
+    background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(var(--secondary-light)) 100%);
+    box-shadow: 0 10px 40px -10px color-mix(in srgb, hsl(var(--secondary)) 40%, transparent);
+  }
+
+  .gradient-accent {
+    background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--accent-light)) 100%);
+  }
+
+  /* Animated gradient background - Much more subtle to avoid washing out content */
+  .gradient-animated {
+    background: linear-gradient(-45deg,
+        color-mix(in srgb, hsl(var(--primary)) 12%, transparent),
+        color-mix(in srgb, hsl(var(--secondary)) 12%, transparent),
+        color-mix(in srgb, hsl(var(--accent)) 12%, transparent),
+        color-mix(in srgb, hsl(var(--primary-light)) 10%, transparent));
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+  }
+
+  /* Text gradients */
+  .text-gradient-primary {
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-light)) 100%);
+  }
+
+  .text-gradient-secondary {
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-image: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(var(--secondary-light)) 100%);
+  }
+
+  /* Glass morphism - More solid for better text contrast */
+  .glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  }
+
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Animations */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 40px color-mix(in srgb, var(--color-primary) 60%, transparent);
+  }
+}
+
+@keyframes blob {
+
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1) rotate(120deg);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9) rotate(240deg);
+  }
+}
+
+/* Animation Classes */
+.animate-blob {
+  animation: blob 20s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.animation-delay-6000 {
+  animation-delay: 6s;
+}
+
+.shimmer {
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 60px -10px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+/* Input focus glow */
+input:focus,
+textarea:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 10%, transparent),
+    0 0 20px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}

@@ -14,21 +14,29 @@ echo -e "${BLUE}=== Ambrane Billing EC2 Setup ===${NC}"
 # 1. Update and Install Dependencies
 echo -e "${GREEN}[1/6] Installing Docker, Docker Compose V2, and Certbot...${NC}"
 sudo apt update
-sudo apt install -y ca-certificates curl gnupg
 
-# Add Docker's official GPG key
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
+if ! command -v docker &> /dev/null; then
+    echo "Docker not found. Installing..."
+    sudo apt install -y ca-certificates curl gnupg
+    
+    # Add Docker's official GPG key
+    sudo install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    
+    # Add the repository to Apt sources
+    echo \
+      "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+      "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    
+    sudo apt update
+    sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+else
+    echo "Docker is already installed. Skipping repository setup."
+fi
 
-# Add the repository to Apt sources
-echo \
-  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin git certbot
+sudo apt install -y git certbot
 
 # 2. Setup Docker permissions
 echo -e "${GREEN}[2/6] Setting up Docker permissions...${NC}"
@@ -52,18 +60,22 @@ echo -e "${GREEN}[4/6] Updating Nginx configuration...${NC}"
 sed -i "s/your-domain.com/$DOMAIN/g" ./nginx/default.conf
 
 # 6. Setup Environment Variables
-echo -e "${GREEN}[5/6] Setting up environment variables...${NC}"
+echo -e "${GREEN}[5/6] Setting up environment variables for $DOMAIN...${NC}"
 if [ ! -f ".env" ]; then
     echo "Creating .env from template..."
-    # You might want to customize this part to accurately reflect your needs
-    cp ./backend/.env.example .env || echo "No .env.example found in backend/"
+    cp ./backend/.env.example .env || touch .env
     
-    # Generate a random JWT secret
+    # Generate a random JWT secret if not present
     JWT_SECRET=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 ; echo '')
     echo "JWT_SECRET=$JWT_SECRET" >> .env
-    echo "NEXT_PUBLIC_API_URL=https://$DOMAIN" >> .env
-    echo "CORS_ORIGIN=https://$DOMAIN" >> .env
 fi
+
+# Ensure domain-specific variables are correct (overwrite or append)
+# We use a temporary file to avoid complex sed patterns for existing keys
+grep -vE "^(NEXT_PUBLIC_API_URL|CORS_ORIGIN)=" .env > .env.tmp || true
+echo "NEXT_PUBLIC_API_URL=https://$DOMAIN" >> .env.tmp
+echo "CORS_ORIGIN=https://$DOMAIN" >> .env.tmp
+mv .env.tmp .env
 
 # 7. Run Docker Compose
 echo -e "${GREEN}[6/6] Launching application with Docker Compose...${NC}"

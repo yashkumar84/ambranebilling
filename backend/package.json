@@ -61,6 +61,6 @@
     "typescript": "^5.3.3"
   },
   "prisma": {
-    "seed": "ts-node -r tsconfig-paths/register prisma/seed.ts"
+    "seed": "ts-node -P tsconfig.json -r tsconfig-paths/register prisma/seed.ts"
   }
 }

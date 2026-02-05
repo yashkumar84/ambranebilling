@@ -1,4 +1,4 @@
-#!/bash
+#!/bin/bash
 # Ambrane Billing - EC2 Setup & Deployment Script
 # This script automates the installation of Docker, Certbot, and the deployment of the application.
 

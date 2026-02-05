@@ -8,6 +8,9 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install dependencies
+# Install dependencies
+# openssl and libc6-compat are required for Prisma on Alpine
+RUN apk add --no-cache openssl libc6-compat
 RUN npm install
 
 # Copy source code
@@ -19,6 +22,9 @@ RUN npm run build
 
 # Production stage
 FROM node:20-alpine
+
+# Install production dependencies for Prisma
+RUN apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
 

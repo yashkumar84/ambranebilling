@@ -1,8 +1,6 @@
 node_modules/
 dist/
-.env
-.env.local
-.env.*.local
+# .env files removed for deployment as requested
 *.log
 .DS_Store
 coverage/

@@ -11,6 +11,20 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}=== Ambrane Billing EC2 Setup ===${NC}"
 
+# 0. Setup Swap Space (Prevents build hangs on small EC2 instances)
+echo -e "${GREEN}[0/6] Checking for Swap Space...${NC}"
+if [ $(free -m | grep Swap | awk '{print $2}') -eq 0 ]; then
+    echo "No swap space found. Creating 2GB swap file..."
+    sudo fallocate -l 2G /swapfile
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    echo "Swap space created successfully."
+else
+    echo "Swap space already exists."
+fi
+
 # 1. Update and Install Dependencies
 echo -e "${GREEN}[1/6] Installing Docker, Docker Compose V2, and Certbot...${NC}"
 sudo apt update

@@ -8,6 +8,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "build": "tsc && tsc-alias",
+    "start": "node dist/server.js",
     "prisma:studio": "prisma studio",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",

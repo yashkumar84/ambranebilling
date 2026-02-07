@@ -6,7 +6,7 @@ interface DetailedOrder extends Order {
     tenant: Tenant;
     customer: Customer | null;
     table: Table | null;
-    paymentMethod?: string | null;
+    paymentMethod: PaymentMethod | null;
 }
 
 export class InvoiceService {
@@ -47,17 +47,17 @@ export class InvoiceService {
             // Small centered header
             doc.fontSize(12).font('Helvetica-Bold').text(order.tenant.businessName, { align: 'center' });
             doc.fontSize(8).font('Helvetica').text(order.tenant.address || '', { align: 'center' });
-            doc.text(`${order.tenant.phone || ''}`, { align: 'center' });
-            if (order.tenant.gstNumber) doc.text(`GST: ${order.tenant.gstNumber}`, { align: 'center' });
+            doc.text(`${order.tenant.phone || ''} `, { align: 'center' });
+            if (order.tenant.gstNumber) doc.text(`GST: ${order.tenant.gstNumber} `, { align: 'center' });
 
             doc.moveDown(0.5);
             this.generateReceiptHr(doc, width - 30);
             doc.moveDown(0.5);
 
-            doc.fontSize(8).text(`Bill: ${order.orderNumber}`);
-            doc.text(`Date: ${new Date(order.createdAt).toLocaleString()}`);
+            doc.fontSize(8).text(`Bill: ${order.orderNumber} `);
+            doc.text(`Date: ${new Date(order.createdAt).toLocaleString()} `);
             if (order.table) {
-                doc.font('Helvetica-Bold').text(`Table: ${order.table.number}`);
+                doc.font('Helvetica-Bold').text(`Table: ${order.table.number} `);
             }
 
             doc.moveDown(0.5);
@@ -65,7 +65,7 @@ export class InvoiceService {
             doc.moveDown(0.5);
 
             if (order.paymentMethod) {
-                doc.fontSize(8).text(`Payment: ${order.paymentMethod}`);
+                doc.fontSize(8).text(`Payment: ${order.paymentMethod} `);
                 doc.moveDown(0.5);
             }
 
@@ -95,7 +95,7 @@ export class InvoiceService {
             this.generateReceiptRow(doc, 'CGST (2.5%)', '', cgst.toFixed(2));
             this.generateReceiptRow(doc, 'SGST (2.5%)', '', sgst.toFixed(2));
             if (Number(order.discountAmount) > 0) {
-                this.generateReceiptRow(doc, 'Discount', '', `-${Number(order.discountAmount).toFixed(2)}`);
+                this.generateReceiptRow(doc, 'Discount', '', `- ${Number(order.discountAmount).toFixed(2)} `);
             }
 
             doc.moveDown(0.5);
@@ -129,8 +129,8 @@ export class InvoiceService {
             .text(tenant.businessName, 50, 57)
             .fontSize(10)
             .text(tenant.address || '', 50, 80)
-            .text(`${tenant.phone || ''} | ${tenant.email || ''}`, 50, 95)
-            .text(`GST: ${tenant.gstNumber || 'N/A'}`, 50, 110)
+            .text(`${tenant.phone || ''} | ${tenant.email || ''} `, 50, 95)
+            .text(`GST: ${tenant.gstNumber || 'N/A'} `, 50, 110)
             .moveDown();
 
         this.generateHr(doc, 130);
@@ -174,7 +174,7 @@ export class InvoiceService {
                 .font('Helvetica-Bold')
                 .text('Dine-In:', 300, customerTop + 45)
                 .font('Helvetica')
-                .text(`Table ${order.table.number}`, 350, customerTop + 45);
+                .text(`Table ${order.table.number} `, 350, customerTop + 45);
         }
 
         this.generateHr(doc, customerTop + 100);
@@ -203,9 +203,9 @@ export class InvoiceService {
                 doc,
                 position,
                 item.productName || item.product.name,
-                `Rs. ${Number(item.unitPrice).toFixed(2)}`,
+                `Rs.${Number(item.unitPrice).toFixed(2)} `,
                 item.quantity.toString(),
-                `Rs. ${Number(item.subtotal).toFixed(2)}`
+                `Rs.${Number(item.subtotal).toFixed(2)} `
             );
 
             this.generateHr(doc, position + 20);
@@ -218,7 +218,7 @@ export class InvoiceService {
             '',
             '',
             'Subtotal',
-            `Rs. ${Number(order.subtotal).toFixed(2)}`
+            `Rs.${Number(order.subtotal).toFixed(2)} `
         );
 
         const cgstAmount = Number(order.taxAmount) / 2;
@@ -231,7 +231,7 @@ export class InvoiceService {
             '',
             '',
             'CGST (2.5%)',
-            `Rs. ${cgstAmount.toFixed(2)}`
+            `Rs.${cgstAmount.toFixed(2)} `
         );
 
         const sgstPosition = cgstPosition + 20;
@@ -241,7 +241,7 @@ export class InvoiceService {
             '',
             '',
             'SGST (2.5%)',
-            `Rs. ${sgstAmount.toFixed(2)}`
+            `Rs.${sgstAmount.toFixed(2)} `
         );
 
         const discountPosition = sgstPosition + 20;
@@ -251,7 +251,7 @@ export class InvoiceService {
             '',
             '',
             'Discount',
-            `- Rs. ${Number(order.discountAmount).toFixed(2)}`
+            `- Rs.${Number(order.discountAmount).toFixed(2)} `
         );
 
         const totalPosition = discountPosition + 25;
@@ -262,14 +262,14 @@ export class InvoiceService {
             '',
             '',
             'Total',
-            `Rs. ${Number(order.totalAmount).toFixed(2)}`
+            `Rs.${Number(order.totalAmount).toFixed(2)} `
         );
 
         // Payment Method
         if (order.paymentMethod) {
             doc.font('Helvetica')
                 .fontSize(10)
-                .text(`Payment Mode: ${order.paymentMethod}`, 50, totalPosition + 30);
+                .text(`Payment Mode: ${order.paymentMethod} `, 50, totalPosition + 30);
         }
         doc.font('Helvetica');
     }

@@ -1,4 +1,4 @@
-import { PrismaClient, PaymentStatus, OrderStatus, PaymentMethod } from '@prisma/client'
+import { PrismaClient, PaymentStatus, OrderStatus } from '@prisma/client'
 import { CreateOrderDTO } from '../dtos/request/create-order.dto'
 import { UpdateOrderDTO } from '../dtos/request/update-order.dto'
 

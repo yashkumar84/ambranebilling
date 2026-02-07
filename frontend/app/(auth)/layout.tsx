@@ -18,99 +18,66 @@ export default function AuthLayout({
     }, [])
 
     return (
-        <div className="min-h-screen gradient-animated relative overflow-hidden selection:bg-primary/30">
-            {/* Background Orbs - Original Style */}
+        <div className="min-h-screen relative overflow-hidden bg-[#02040a] selection:bg-teal-500/30">
+            {/* Core Luminous Plasma Field - Centered Brilliance */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                {/* Central Primary Glow */}
                 <motion.div
                     animate={{
-                        scale: [1, 1.2, 1],
-                        x: [0, 100, 0],
-                        y: [0, -50, 0],
-                        rotate: [0, 180, 360],
+                        scale: [1, 1.2, 1.1, 1],
+                        opacity: [0.3, 0.45, 0.35, 0.3],
+                    }}
+                    transition={{
+                        duration: 15,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                    }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] rounded-full bg-gradient-to-r from-teal-500/30 via-cyan-400/20 to-violet-500/30 blur-[160px]"
+                />
+
+                {/* Shifting Aurora Orbs */}
+                <motion.div
+                    animate={{
+                        x: ['-10%', '10%', '-5%', '-10%'],
+                        y: ['-5%', '15%', '0%', '-5%'],
+                        rotate: [0, 90, 0],
                     }}
                     transition={{
                         duration: 25,
                         repeat: Infinity,
-                        ease: 'easeInOut',
+                        ease: 'linear',
                     }}
-                    className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-20"
-                    style={{
-                        background: `radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)`,
-                        filter: 'blur(100px)',
-                    }}
+                    className="absolute top-[10%] left-[15%] w-[50%] h-[50%] rounded-full bg-indigo-600/10 blur-[130px]"
                 />
                 <motion.div
                     animate={{
-                        scale: [1, 1.3, 1],
-                        x: [0, -80, 0],
-                        y: [0, 80, 0],
-                        rotate: [360, 180, 0],
+                        x: ['10%', '-15%', '5%', '10%'],
+                        y: ['15%', '-10%', '0%', '15%'],
+                        rotate: [0, -90, 0],
                     }}
                     transition={{
                         duration: 20,
                         repeat: Infinity,
-                        ease: 'easeInOut',
-                        delay: 2,
+                        ease: 'linear',
                     }}
-                    className="absolute -top-20 -right-40 w-[500px] h-[500px] rounded-full opacity-20"
-                    style={{
-                        background: `radial-gradient(circle, hsl(var(--secondary)) 0%, transparent 70%)`,
-                        filter: 'blur(100px)',
-                    }}
+                    className="absolute bottom-[10%] right-[15%] w-[50%] h-[50%] rounded-full bg-emerald-500/10 blur-[130px]"
                 />
             </div>
 
-            {/* Decorative Grid */}
-            <div className="fixed inset-0 pointer-events-none opacity-[0.03]">
-                <div
-                    className="absolute inset-0"
-                    style={{
-                        backgroundImage: `
-              linear-gradient(hsl(var(--primary)) 1px, transparent 1px),
-              linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)
-            `,
-                        backgroundSize: '50px 50px',
-                    }}
-                />
-            </div>
+            {/* Prismatic Overlay Layer */}
+            <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03)_0%,transparent_100%)]" />
+            <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay" />
 
-            {/* Floating Particles - Hydration Safe */}
-            {mounted && (
-                <div className="fixed inset-0 pointer-events-none">
-                    {[...Array(15)].map((_, i) => (
-                        <motion.div
-                            key={i}
-                            className="absolute rounded-full bg-primary/20"
-                            style={{
-                                left: `${(i * 7) % 100}%`,
-                                top: `${(i * 13) % 100}%`,
-                                width: `${(i % 4) + 2}px`,
-                                height: `${(i % 4) + 2}px`,
-                            }}
-                            animate={{
-                                y: [0, -30, 0],
-                                opacity: [0.2, 0.5, 0.2],
-                            }}
-                            transition={{
-                                duration: 3 + (i % 3),
-                                repeat: Infinity,
-                                delay: i * 0.1,
-                            }}
-                        />
-                    ))}
-                </div>
-            )}
-
-            {/* Content Container */}
-            <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+            {/* Boundless Content Container */}
+            <div className="relative z-10 w-full min-h-screen">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key="auth-content"
-                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                        transition={{ duration: 0.4 }}
-                        className="w-full max-w-md"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="w-full"
                     >
                         {children}
                     </motion.div>

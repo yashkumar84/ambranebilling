@@ -65,30 +65,72 @@ export class ProductService {
                 currentStock: data.stock || 0,
                 baseUnit: data.unit || 'PCS',
                 isActive: data.isActive ?? true,
+                hasVariants: data.variants && data.variants.length > 0,
+                variants: {
+                    create: data.variants?.map((v: any) => ({
+                        variantName: v.name || v.variantName,
+                        priceAdjustment: v.priceAdjustment || 0,
+                        variantSku: v.sku || v.variantSku,
+                        isActive: v.isActive ?? true,
+                    }))
+                }
             },
+            include: {
+                variants: true
+            }
         })
     }
     async update(id: string, data: any, tenantId: string) {
         const product = await prisma.product.findFirst({
             where: { id, tenantId },
+            include: { variants: true }
         })
 
         if (!product) {
             throw new Error('Product not found')
         }
 
-        return await prisma.product.update({
-            where: { id },
-            data: {
-                name: data.name,
-                sku: data.sku,
-                description: data.description,
-                category: data.category,
-                sellingPrice: data.price || data.sellingPrice,
-                currentStock: data.stock || data.currentStock,
-                baseUnit: data.unit || data.baseUnit,
-                isActive: data.isActive,
-            },
+        return await prisma.$transaction(async (tx) => {
+            // If we have variants data, we need to sync them
+            if (data.variants) {
+                // Remove existing ones that are not in the new data (atomic sync)
+                await tx.productVariant.deleteMany({
+                    where: { productId: id }
+                })
+
+                // Add the new ones
+                await tx.product.update({
+                    where: { id },
+                    data: {
+                        variants: {
+                            create: data.variants.map((v: any) => ({
+                                variantName: v.name || v.variantName,
+                                priceAdjustment: v.priceAdjustment || 0,
+                                variantSku: v.sku || v.variantSku,
+                                isActive: v.isActive ?? true,
+                            }))
+                        }
+                    }
+                })
+            }
+
+            return await tx.product.update({
+                where: { id },
+                data: {
+                    name: data.name,
+                    sku: data.sku,
+                    description: data.description,
+                    category: data.category,
+                    sellingPrice: data.price || data.sellingPrice,
+                    currentStock: data.stock || data.currentStock,
+                    baseUnit: data.unit || data.baseUnit,
+                    isActive: data.isActive,
+                    hasVariants: data.variants && data.variants.length > 0,
+                },
+                include: {
+                    variants: true
+                }
+            })
         })
     }
 
@@ -106,5 +148,15 @@ export class ProductService {
         })
 
         return { message: 'Product deleted successfully' }
+    }
+
+    async getCategories(tenantId: string) {
+        const categories = await prisma.product.findMany({
+            where: { tenantId, category: { not: null } },
+            select: { category: true },
+            distinct: ['category'],
+        })
+
+        return categories.map(c => c.category).filter(Boolean)
     }
 }

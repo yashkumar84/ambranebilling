@@ -20,6 +20,7 @@ export async function errorHandler(
         err: error,
         url: request.url,
         method: request.method,
+        user: (request as any).user, // Added user context for debugging 400s
     }, 'Error occurred')
 
     // Handle validation errors

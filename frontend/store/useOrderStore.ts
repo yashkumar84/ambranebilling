@@ -6,7 +6,7 @@ interface OrderState {
     orders: Order[];
     loading: boolean;
     error: string | null;
-    fetchOrders: (restaurantId?: string) => Promise<void>;
+    fetchOrders: () => Promise<void>;
     updateOrderStatus: (id: string, status: OrderStatus) => Promise<void>;
 }
 
@@ -14,11 +14,12 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     orders: [],
     loading: false,
     error: null,
-    fetchOrders: async (restaurantId = '1') => {
+    fetchOrders: async () => {
         set({ loading: true });
         try {
-            const response = await orderService.getAll(restaurantId);
-            set({ orders: response.data.items, error: null });
+            const response = await orderService.getAll();
+            // Backend returns { orders: [...], pagination: {...} }
+            set({ orders: response.data.orders, error: null });
         } catch (error: any) {
             set({ error: error.message });
         } finally {

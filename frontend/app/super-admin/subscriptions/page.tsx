@@ -61,9 +61,9 @@ export default function SubscriptionsManagementPage() {
         }
     }
 
-    const filteredSubscriptions = subscriptions.filter(sub => {
-        const matchesSearch = sub.tenant.businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            sub.tenant.email.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredSubscriptions = (subscriptions || []).filter(sub => {
+        const matchesSearch = sub.tenant?.businessName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            sub.tenant?.email?.toLowerCase().includes(searchQuery.toLowerCase())
         const matchesStatus = statusFilter === 'ALL' || sub.status === statusFilter
         return matchesSearch && matchesStatus
     })

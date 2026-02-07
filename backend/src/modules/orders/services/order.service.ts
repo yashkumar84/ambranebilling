@@ -1,4 +1,4 @@
-import { PrismaClient, PaymentStatus, OrderStatus } from '@prisma/client'
+import { PrismaClient, PaymentStatus, OrderStatus, PaymentMethod } from '@prisma/client'
 import { CreateOrderDTO } from '../dtos/request/create-order.dto'
 import { UpdateOrderDTO } from '../dtos/request/update-order.dto'
 
@@ -45,6 +45,10 @@ export class OrderService {
                         product: true,
                     },
                 },
+                tenant: true,
+                customer: true,
+                table: true,
+                user: true,
             },
         })
 
@@ -64,7 +68,7 @@ export class OrderService {
             return {
                 productId: item.productId,
                 variantId: item.variantId,
-                productName: '', // Will be filled from product
+                productName: item.productName || '',
                 unitPrice: item.price,
                 quantity: item.quantity,
                 subtotal: itemTotal,
@@ -84,16 +88,17 @@ export class OrderService {
                 tableId: data.tableId,
                 customerId: data.customerId,
                 orderType: data.orderType || 'DINE_IN',
-                status: 'PENDING',
+                status: (data.status || 'PENDING') as OrderStatus,
                 subtotal,
                 taxAmount,
                 discountAmount,
                 totalAmount,
                 paymentStatus: (data.paymentStatus || 'PENDING') as PaymentStatus,
+                paymentMethod: data.paymentMethod as any,
                 items: {
                     create: items,
                 },
-            },
+            } as any,
             include: {
                 items: {
                     include: {
@@ -240,6 +245,45 @@ export class OrderService {
             ordersByType,
             totalRevenue: Number(totalRevenue._sum.totalAmount || 0),
         }
+    }
+
+    async processRefund(id: string, tenantId: string) {
+        const order = await prisma.order.findFirst({
+            where: { id, tenantId },
+            include: { items: true },
+        })
+
+        if (!order) {
+            throw new Error('Order not found')
+        }
+
+        if (order.paymentStatus === PaymentStatus.REFUNDED) {
+            throw new Error('Order is already refunded')
+        }
+
+        return await prisma.$transaction(async (tx) => {
+            // Update order status
+            const updatedOrder = await tx.order.update({
+                where: { id },
+                data: {
+                    paymentStatus: PaymentStatus.REFUNDED,
+                    status: OrderStatus.CANCELLED,
+                },
+            })
+
+            // Record refund payment
+            await tx.payment.create({
+                data: {
+                    orderId: id,
+                    amount: order.totalAmount, // Negative amount for refund? Or separate field?
+                    paymentMethod: 'CASH', // Default or from original payment
+                    paymentStatus: PaymentStatus.REFUNDED,
+                    transactionId: `REF-${order.orderNumber}`,
+                }
+            })
+
+            return updatedOrder
+        })
     }
 
     private async generateOrderNumber(tenantId: string): Promise<string> {

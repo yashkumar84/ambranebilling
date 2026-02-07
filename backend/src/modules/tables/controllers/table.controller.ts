@@ -20,7 +20,7 @@ export class TableController {
 
     async getTables(request: FastifyRequest, reply: FastifyReply) {
         const { page = 1, limit = 20, status } = request.query as any
-        const tenantId = (request as any).tenantId
+        const tenantId = (request as any).user?.tenantId
         if (!tenantId) {
             return reply.code(403).send(ApiResponse.error('Tenant context required'))
         }
@@ -41,7 +41,7 @@ export class TableController {
 
     async createTable(request: FastifyRequest, reply: FastifyReply) {
         const data = request.body as CreateTableDTO
-        const tenantId = (request as any).tenantId
+        const tenantId = (request as any).user?.tenantId
         if (!tenantId) {
             return reply.code(403).send(ApiResponse.error('Tenant context required'))
         }

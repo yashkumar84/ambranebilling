@@ -9,6 +9,7 @@ export default async function tableRoutes(fastify: FastifyInstance) {
 
     // Get all tables for a restaurant
     fastify.get('/restaurant/:restaurantId', {
+        onRequest: [authMiddleware],
         schema: {
             description: 'Get all tables for a restaurant',
             tags: ['Tables'],
@@ -18,6 +19,7 @@ export default async function tableRoutes(fastify: FastifyInstance) {
 
     // Get single table
     fastify.get('/:id', {
+        onRequest: [authMiddleware],
         schema: {
             description: 'Get table by ID',
             tags: ['Tables'],

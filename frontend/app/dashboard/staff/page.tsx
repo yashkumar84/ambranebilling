@@ -39,12 +39,12 @@ export default function StaffPage() {
 
     const getRoleColor = (role: string) => {
         switch (role.toUpperCase()) {
-            case 'TENANT_OWNER': return 'bg-red-500/10 text-red-500'
-            case 'MANAGER': return 'bg-purple-500/10 text-purple-500'
-            case 'CASHIER': return 'bg-blue-500/10 text-blue-500'
-            case 'WAITER': return 'bg-blue-500/10 text-blue-500'
-            case 'STAFF': return 'bg-green-500/10 text-green-500'
-            default: return 'bg-gray-500/10 text-gray-500'
+            case 'TENANT_OWNER': return 'bg-destructive/10 text-destructive font-black'
+            case 'MANAGER': return 'bg-primary/10 text-primary font-black'
+            case 'CASHIER': return 'bg-secondary/10 text-secondary font-black'
+            case 'WAITER': return 'bg-secondary/10 text-secondary font-black'
+            case 'STAFF': return 'bg-success/10 text-success font-black'
+            default: return 'bg-muted text-muted-foreground'
         }
     }
 
@@ -125,7 +125,7 @@ export default function StaffPage() {
                                     </button>
                                     <button
                                         onClick={() => handleDelete(user.id)}
-                                        className="p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-all"
+                                        className="p-2 bg-destructive/10 text-destructive hover:bg-destructive hover:text-white rounded-lg transition-all"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>

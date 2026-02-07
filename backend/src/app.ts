@@ -146,6 +146,14 @@ app.register(tenantsRoutes, { prefix: '/api/tenants' })
 import subscriptionRoutes from './modules/subscriptions/routes/subscription.routes'
 app.register(subscriptionRoutes, { prefix: '/api/subscriptions' })
 
+// Import analytics routes
+import analyticsRoutes from './modules/analytics/routes/analytics.routes'
+app.register(analyticsRoutes, { prefix: '/api/analytics' })
+
+// Import marketing routes
+import marketingRoutes from './modules/marketing/routes/offer.routes'
+app.register(marketingRoutes, { prefix: '/api/marketing' })
+
 // Error handler
 app.setErrorHandler(errorHandler)
 

@@ -8,6 +8,11 @@ export default async function productRoutes(fastify: FastifyInstance) {
     // All product routes require authentication
     fastify.addHook('onRequest', authMiddleware)
 
+    // List all categories
+    fastify.get('/categories', {
+        handler: controller.getCategories,
+    })
+
     // List all products for the tenant
     fastify.get('/', {
         schema: {

@@ -116,4 +116,37 @@ export default async function orderRoutes(fastify: FastifyInstance) {
         },
         handler: controller.deleteOrder,
     })
+
+    // Process refund (protected)
+    fastify.post('/:id/refund', {
+        onRequest: [authMiddleware],
+        schema: {
+            description: 'Process order refund',
+            tags: ['Orders'],
+            security: [{ bearerAuth: [] }],
+        },
+        handler: controller.processRefund,
+    })
+
+    // Generate invoice (protected)
+    fastify.get('/:id/invoice', {
+        onRequest: [authMiddleware],
+        schema: {
+            description: 'Generate and download order invoice PDF',
+            tags: ['Orders'],
+            security: [{ bearerAuth: [] }],
+        },
+        handler: controller.generateInvoice,
+    })
+
+    // Generate receipt (thermal) (protected)
+    fastify.get('/:id/receipt', {
+        onRequest: [authMiddleware],
+        schema: {
+            description: 'Generate and view order thermal receipt PDF',
+            tags: ['Orders'],
+            security: [{ bearerAuth: [] }],
+        },
+        handler: controller.generateReceipt,
+    })
 }

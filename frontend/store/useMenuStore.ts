@@ -20,7 +20,13 @@ export const useMenuStore = create<MenuState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await menuService.getAll(restaurantId);
-            const products = (response.data as any).products || (response.data as any).items || [];
+            const products = ((response.data as any).products || (response.data as any).items || []).map((p: any) => ({
+                ...p,
+                price: Number(p.price || p.sellingPrice || 0),
+                isAvailable: p.isAvailable ?? true,
+                isVeg: p.dietaryTags?.includes('VEG') || p.mealTypes?.includes('VEG') || false,
+                variants: p.variants || []
+            }));
             set({ items: products, error: null });
         } catch (error: any) {
             set({ error: error.message });

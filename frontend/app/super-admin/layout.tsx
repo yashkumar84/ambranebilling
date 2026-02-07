@@ -30,7 +30,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
         <div className="min-h-screen bg-background">
             {/* Header */}
             <header className="bg-card border-b border-border sticky top-0 z-10 backdrop-blur-sm bg-opacity-95">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center space-x-8">
                             <h1 className="text-xl font-bold text-gradient-primary">Super Admin</h1>
@@ -81,7 +81,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             </header>
 
             {/* Main Content */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</main>
+            <main className="max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 py-8">{children}</main>
         </div>
     )
 }

@@ -18,35 +18,35 @@ export const themes = {
     },
     pastel: {
         name: 'Pastel Dream',
-        primary: '182 45% 45%',       // Darker for contrast
-        primaryLight: '182 35% 71%',  // Original light version
-        secondary: '217 38% 42%',     // Darker
+        primary: '182 45% 42%',       // Slightly darker
+        primaryLight: '182 35% 71%',
+        secondary: '217 38% 38%',     // Darker for contrast
         secondaryLight: '217 28% 62%',
         accent: '0 47% 75%',
         accentLight: '0 47% 90%',
-        background: '182 30% 98%',    // Off-white pastel
+        background: '182 30% 98%',
         foreground: '182 60% 10%',
         card: '0 0% 100%',
         cardForeground: '182 60% 10%',
         border: '182 30% 90%',
         muted: '182 30% 96%',
-        mutedForeground: '182 20% 40%',
+        mutedForeground: '182 20% 35%', // Darker for readability
     },
     sky: {
         name: 'Sky Blue',
-        primary: '218 50% 44%',       // Darker
+        primary: '218 50% 40%',       // Darker
         primaryLight: '218 60% 74%',
-        secondary: '199 65% 47%',     // Darker
+        secondary: '199 65% 42%',     // Darker
         secondaryLight: '199 75% 77%',
         accent: '192 43% 82%',
         accentLight: '45 100% 92%',
         background: '218 40% 98%',
-        foreground: '218 60% 15%',
+        foreground: '218 60% 12%',
         card: '0 0% 100%',
-        cardForeground: '218 60% 15%',
-        border: '218 40% 92%',
+        cardForeground: '218 60% 12%',
+        border: '218 40% 90%',
         muted: '218 40% 96%',
-        mutedForeground: '218 20% 40%',
+        mutedForeground: '218 20% 35%', // Darker
     },
     default: {
         name: 'Blue Ocean',
@@ -82,19 +82,19 @@ export const themes = {
     },
     sunset: {
         name: 'Sunset Orange',
-        primary: '24.6 95% 43.1%',    // Darker
+        primary: '24.6 95% 40.1%',    // Darker
         primaryLight: '24.6 95% 53.1%',
-        secondary: '0 84.2% 50.2%',   // Darker
+        secondary: '0 84.2% 45.2%',   // Darker
         secondaryLight: '0 84.2% 60.2%',
         accent: '45 93% 47%',
         accentLight: '45 93% 57%',
-        background: '25 40% 98%',     // Warm off-white
-        foreground: '25 60% 12%',
+        background: '25 40% 98%',
+        foreground: '25 60% 10%',
         card: '0 0% 100%',
-        cardForeground: '25 60% 12%',
-        border: '25 40% 92%',
+        cardForeground: '25 60% 10%',
+        border: '25 40% 90%',
         muted: '25 40% 96%',
-        mutedForeground: '25 10% 45%',
+        mutedForeground: '25 10% 35%', // Darker
     },
     ocean: {
         name: 'Deep Ocean',

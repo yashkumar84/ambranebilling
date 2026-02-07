@@ -5,6 +5,7 @@ interface User {
     id: string
     email: string
     name: string
+    role?: string
     phone?: string
     tenantId?: string
     isSuperAdmin: boolean

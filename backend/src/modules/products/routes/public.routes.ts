@@ -36,6 +36,7 @@ export default async function publicRoutes(fastify: FastifyInstance) {
                             type: 'object',
                             properties: {
                                 productId: { type: 'string' },
+                                variantId: { type: 'string' },
                                 quantity: { type: 'number' },
                                 price: { type: 'number' }
                             },
@@ -49,5 +50,56 @@ export default async function publicRoutes(fastify: FastifyInstance) {
             }
         },
         handler: controller.createPublicOrder,
+    })
+
+    // Public payment verification
+    fastify.post('/verify', {
+        schema: {
+            description: 'Verify payment for a public order',
+            tags: ['Public'],
+            body: {
+                type: 'object',
+                properties: {
+                    orderId: { type: 'string' },
+                    paymentId: { type: 'string' },
+                    signature: { type: 'string' }
+                },
+                required: ['orderId', 'paymentId', 'signature']
+            }
+        },
+        handler: controller.verifyPublicOrderPayment,
+    })
+
+    // Customer Loyalty Hub
+    fastify.get('/hub/:tenantId/:phone', {
+        schema: {
+            description: 'Get customer loyalty profile and history',
+            tags: ['Public'],
+            params: {
+                type: 'object',
+                properties: {
+                    tenantId: { type: 'string' },
+                    phone: { type: 'string' }
+                },
+                required: ['tenantId', 'phone']
+            }
+        },
+        handler: controller.getCustomerHub,
+    })
+
+    // Active Offers
+    fastify.get('/offers/:tenantId', {
+        schema: {
+            description: 'Get active store offers',
+            tags: ['Public'],
+            params: {
+                type: 'object',
+                properties: {
+                    tenantId: { type: 'string' }
+                },
+                required: ['tenantId']
+            }
+        },
+        handler: controller.getStoreOffers,
     })
 }

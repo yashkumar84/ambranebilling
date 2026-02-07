@@ -47,7 +47,10 @@ export interface Order {
     tableId?: string;
     userId: string;
     status: OrderStatus;
-    total: number;
+    paymentStatus?: PaymentStatus;
+    paymentMethod?: PaymentMethod;
+    totalAmount: number;
+    total?: number; // Alias for backward compatibility
     createdAt: string;
     items: OrderItem[];
 }
@@ -70,6 +73,15 @@ export interface MenuItem {
     image?: string;
     isAvailable: boolean;
     isVeg: boolean;
+    variants?: Partial<MenuItemVariant>[];
+}
+
+export interface MenuItemVariant {
+    id: string;
+    variantName: string;
+    priceAdjustment: number;
+    variantSku?: string;
+    isActive: boolean;
 }
 
 export type TableStatus = 'AVAILABLE' | 'OCCUPIED' | 'RESERVED';
@@ -88,6 +100,7 @@ export interface Customer {
     email?: string;
     address?: string;
     createdAt: string;
+    orders?: any[]; // For details view
 }
 
 export interface Role {

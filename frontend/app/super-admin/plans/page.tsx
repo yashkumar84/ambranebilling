@@ -119,7 +119,7 @@ export default function PlansManagementPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {plans.map((plan) => (
+                {(plans || []).map((plan) => (
                     <motion.div
                         key={plan.id}
                         layout
@@ -198,7 +198,7 @@ export default function PlansManagementPage() {
                     </motion.div>
                 ))}
 
-                {loading && plans.length === 0 && (
+                {loading && (plans || []).length === 0 && (
                     Array(3).fill(0).map((_, i) => (
                         <div key={i} className="h-96 bg-card border border-border rounded-3xl animate-pulse" />
                     ))

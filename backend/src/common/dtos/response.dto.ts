@@ -23,7 +23,13 @@ export class ApiResponse<T = any> {
         }
     }
 
-    static error(error: string, message?: string): ApiResponse {
-        return new ApiResponse(false, undefined, error, message)
+    static error(error: string, message?: string) {
+        // Return plain object instead of class instance for proper serialization
+        return {
+            success: false,
+            error,
+            message,
+            timestamp: new Date().toISOString()
+        }
     }
 }

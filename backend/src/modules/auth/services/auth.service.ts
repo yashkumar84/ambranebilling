@@ -10,6 +10,9 @@ import { redis } from '@/config/redis.config'
 const jwt = require('jsonwebtoken')
 const prisma = new PrismaClient()
 
+// Memory fallback for OTPs when Redis is down in dev
+const otpMemoryStore = new Map<string, string>()
+
 export class AuthService {
     /**
      * Send OTP to email
@@ -18,27 +21,49 @@ export class AuthService {
         // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString()
 
-        // Store in Redis with 10-minute expiry
-        const ttl = 10 * 60 // 10 minutes in seconds
-        await redis.setex(`otp:${email}`, ttl, otp)
+        try {
+            // Store in Redis with 10-minute expiry
+            const ttl = 10 * 60 // 10 minutes in seconds
+            await redis.setex(`otp:${email}`, ttl, otp)
 
-        // Mock sending email - log to console
-        console.log('------------------------------------------')
-        console.log(`OTP for ${email}: ${otp}`)
-        console.log('------------------------------------------')
+            console.log('------------------------------------------')
+            console.log(`[REDIS] OTP for ${email}: ${otp}`)
+            console.log('------------------------------------------')
+        } catch (redisError) {
+            console.warn('⚠️ Redis not available, using memory store fallback')
+            otpMemoryStore.set(email, otp)
+
+            // Auto-clear after 10 mins
+            setTimeout(() => otpMemoryStore.delete(email), 10 * 60 * 1000)
+
+            console.log('------------------------------------------')
+            console.log(`[MEMORY] OTP for ${email}: ${otp}`)
+            console.log('------------------------------------------')
+        }
 
         // In production: Integration with SendGrid/SES would go here
     }
 
     async register(data: RegisterRequestDTO): Promise<AuthResponseDTO> {
         // 1. Verify OTP
-        const storedOtp = await redis.get(`otp:${data.email}`)
-        if (!storedOtp || storedOtp !== data.otpCode) {
-            throw new AppError(400, 'Invalid or expired OTP')
+        let storedOtp: string | null = null
+        try {
+            storedOtp = await redis.get(`otp:${data.email}`)
+        } catch (e) {
+            console.warn('⚠️ Redis unreachable, checking memory store')
+            storedOtp = otpMemoryStore.get(data.email) || null
         }
 
-        // 2. Clear OTP from Redis
-        await redis.del(`otp:${data.email}`)
+        if (!storedOtp || storedOtp !== data.otpCode) {
+            throw new AppError(400, 'Invalid or expired Secure Access Key')
+        }
+
+        // 2. Clear OTP
+        try {
+            await redis.del(`otp:${data.email}`)
+        } catch (e) {
+            otpMemoryStore.delete(data.email)
+        }
 
         // 3. Check if user already exists
         const existingUser = await prisma.user.findUnique({
@@ -300,7 +325,11 @@ export class AuthService {
     private async storeRefreshToken(userId: string, refreshToken: string): Promise<void> {
         const key = `refresh_token:${userId}`
         const ttl = 30 * 24 * 60 * 60 // 30 days in seconds
-        await redis.setex(key, ttl, refreshToken)
+        try {
+            await redis.setex(key, ttl, refreshToken)
+        } catch (error) {
+            console.warn('⚠️ Failed to store refresh token in Redis, proceeding without persistence:', error)
+        }
     }
 
     /**

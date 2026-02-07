@@ -5,6 +5,7 @@ const orderItemSchema = z.object({
     variantId: z.string().uuid().optional(),
     quantity: z.number().int().positive(),
     price: z.number().positive(),
+    productName: z.string().optional(),
     notes: z.string().optional(),
 })
 
@@ -18,8 +19,9 @@ export const createOrderSchema = z.object({
     notes: z.string().optional(),
     discount: z.number().min(0).default(0),
     taxRate: z.number().min(0).default(0),
-    paymentMethod: z.string().optional(),
-    paymentStatus: z.enum(['PENDING', 'PAID', 'FAILED', 'REFUNDED']).default('PENDING'),
+    paymentMethod: z.enum(['CASH', 'CARD', 'UPI', 'WALLET', 'CREDIT']).optional(),
+    paymentStatus: z.enum(['PENDING', 'COMPLETED', 'FAILED', 'REFUNDED']).default('PENDING'),
+    status: z.enum(['PENDING', 'PREPARING', 'READY', 'SERVED', 'COMPLETED', 'CANCELLED']).optional(),
 })
 
 export type CreateOrderDTO = z.infer<typeof createOrderSchema>

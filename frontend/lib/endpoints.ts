@@ -77,6 +77,8 @@ export const endpoints = {
         updateStatus: (id: string) => `/api/orders/${id}/status`,
         stats: (restaurantId: string) => `/api/orders/stats/restaurant/${restaurantId}`,
         analytics: (restaurantId: string) => `/api/orders/analytics/restaurant/${restaurantId}`,
+        invoice: (id: string) => `/api/orders/${id}/invoice`,
+        receipt: (id: string) => `/api/orders/${id}/receipt`,
     },
 
     // Payments
@@ -85,6 +87,22 @@ export const endpoints = {
         create: '/api/payments',
         get: (id: string) => `/api/payments/${id}`,
         stats: '/api/payments/stats',
+    },
+
+    // Analytics
+    analytics: {
+        dashboard: '/api/analytics/dashboard',
+        trends: (days: number = 7) => `/api/analytics/trends?days=${days}`,
+    },
+
+    // Tenants
+    tenants: {
+        me: '/api/tenants/me',
+        update: (id: string) => `/api/tenants/${id}`,
+        settings: '/api/tenants/settings',
+        logo: '/api/tenants/logo',
+        subscription: '/api/tenants/subscription',
+        usage: '/api/tenants/usage',
     },
 
     // Super Admin

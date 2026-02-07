@@ -1,7 +1,24 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { TrendingUp, DollarSign, ShoppingCart, Users, PieChart as PieChartIcon, BarChart3, Calendar } from 'lucide-react'
+import {
+    TrendingUp,
+    DollarSign,
+    ShoppingCart,
+    Users,
+    PieChart as PieChartIcon,
+    BarChart3,
+    Calendar,
+    ArrowUpRight,
+    ArrowDownRight,
+    Download,
+    Filter,
+    Activity,
+    Target,
+    Zap,
+    History,
+    MoreHorizontal
+} from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/lib/api'
 import endpoints from '@/lib/endpoints'
@@ -17,22 +34,26 @@ import {
     Bar,
     PieChart,
     Pie,
-    Cell
+    Cell,
+    LineChart,
+    Line
 } from 'recharts'
 import { format, subDays, startOfDay } from 'date-fns'
+import { Card, CardContent } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { cn } from '@/lib/utils'
 
 export default function AnalyticsPage() {
     // Fetch detailed analytics
     const { data: analyticsData, isLoading } = useQuery({
         queryKey: ['analytics-detailed'],
         queryFn: async () => {
-            // Using restaurantId 1 for now
             const response = await api.get(endpoints.orders.analytics('1'))
             return response.data.data
         }
     })
 
-    // Fetch basic stats for top cards
+    // Fetch basic stats
     const { data: statsData } = useQuery({
         queryKey: ['dashboard-stats'],
         queryFn: async () => {
@@ -52,165 +73,278 @@ export default function AnalyticsPage() {
         }) : []
 
     const stats = [
-        { label: 'Total Revenue', value: statsData ? `₹${statsData.totalRevenue.toLocaleString()}` : '₹0', change: '+12.5%', icon: DollarSign },
-        { label: 'Total Orders', value: statsData ? statsData.totalOrders.toString() : '0', change: '+8.2%', icon: ShoppingCart },
-        { label: 'Avg Order Value', value: statsData && statsData.totalOrders > 0 ? `₹${Math.round(statsData.totalRevenue / statsData.totalOrders)}` : '₹0', change: '+5.1%', icon: TrendingUp },
-        { label: 'Active Tables', value: statsData ? statsData.activeTables.toString() : '0', change: 'Live', icon: Users },
+        { label: 'Total Revenue', value: statsData ? `₹${(statsData.totalRevenue || 0).toLocaleString()}` : '₹0', growth: 12.5, icon: DollarSign, color: 'text-primary-400' },
+        { label: 'Orders Processed', value: statsData ? (statsData.totalOrders || 0).toString() : '0', growth: 8.2, icon: ShoppingCart, color: 'text-secondary-400' },
+        { label: 'Avg Order Value', value: statsData && (statsData.totalOrders || 0) > 0 ? `₹${Math.round((statsData.totalRevenue || 0) / statsData.totalOrders)}` : '₹0', growth: -2.4, icon: TrendingUp, color: 'text-accent-400' },
+        { label: 'Active Sessions', value: statsData ? (statsData.activeTables || 0).toString() : '0', growth: 0, icon: Users, color: 'text-success-400' },
     ]
 
-    const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#0088FE', '#00C49F']
+    const COLORS = ['#06B6D4', '#6366F1', '#F43F5E', '#10B981', '#F59E0B']
 
     if (isLoading) {
         return (
-            <div className="p-6 space-y-6 animate-pulse">
-                <div className="h-20 bg-card rounded-2xl w-1/3" />
-                <div className="grid grid-cols-4 gap-6">
-                    {[...Array(4)].map((_, i) => <div key={i} className="h-32 bg-card rounded-2xl" />)}
+            <div className="space-y-8 animate-pulse pb-10">
+                <div className="flex justify-between items-center">
+                    <div className="space-y-2">
+                        <div className="h-8 w-64 bg-white/5 rounded-lg" />
+                        <div className="h-4 w-48 bg-white/5 rounded-lg" />
+                    </div>
                 </div>
-                <div className="h-[400px] bg-card rounded-2xl" />
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    {[...Array(4)].map((_, i) => <Card key={i} className="h-32" />)}
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <Card className="lg:col-span-2 h-[400px]" />
+                    <Card className="h-[400px]" />
+                </div>
             </div>
         )
     }
 
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-8 pb-10">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-foreground">Performance Analytics</h1>
-                    <p className="text-muted-foreground mt-1">Real-time insights for your restaurant</p>
+                    <h1 className="text-2xl font-black tracking-tight text-foreground mb-0.5">Performance Analytics</h1>
+                    <p className="text-xs text-muted-foreground font-medium">Multi-dimensional insights and business intelligence.</p>
                 </div>
-                <div className="flex gap-2">
-                    <button className="px-4 py-2 bg-card border border-border rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-muted transition-colors">
-                        <Calendar className="w-4 h-4" />
-                        Last 7 Days
-                    </button>
+                <div className="flex items-center gap-2">
+                    <Button variant="outline" className="h-11">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Custom Range
+                    </Button>
+                    <Button className="h-11 shadow-lg shadow-primary/20">
+                        <Download className="w-4 h-4 mr-2" />
+                        Generate PDF
+                    </Button>
                 </div>
             </div>
 
-            {/* Top Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Core Metrics Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((stat, index) => (
                     <motion.div
                         key={index}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="bg-card rounded-2xl p-6 shadow-lg border border-border"
                     >
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                                <stat.icon className="w-6 h-6 text-primary" />
+                        <Card className="p-4 transition-all duration-300 hover:border-primary-500/30 group relative overflow-hidden">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="w-10 h-10 rounded-xl bg-primary-500/5 border border-white/5 flex items-center justify-center group-hover:bg-primary-500/10 transition-colors">
+                                    <stat.icon className={cn("w-5 h-5", stat.color)} />
+                                </div>
+                                {stat.growth !== 0 && (
+                                    <div className={cn(
+                                        "flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black tracking-widest uppercase border",
+                                        stat.growth > 0 ? "bg-success-500/10 text-success-600 border-success-500/20" : "bg-error-500/10 text-error-600 border-error-500/20"
+                                    )}>
+                                        {stat.growth > 0 ? <ArrowUpRight className="w-2.5 h-2.5" /> : <ArrowDownRight className="w-2.5 h-2.5" />}
+                                        {Math.abs(stat.growth)}%
+                                    </div>
+                                )}
                             </div>
-                            <span className={`text-xs font-black px-2 py-1 rounded-full ${stat.change.startsWith('+') ? 'bg-green-500/10 text-green-500' : 'bg-blue-500/10 text-blue-500'}`}>
-                                {stat.change}
-                            </span>
-                        </div>
-                        <h3 className="text-3xl font-black text-foreground mb-1">{stat.value}</h3>
-                        <p className="text-muted-foreground text-sm font-bold uppercase tracking-wider">{stat.label}</p>
+                            <h3 className="text-2xl font-black text-foreground mb-0.5 tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</h3>
+                            <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
+                        </Card>
                     </motion.div>
                 ))}
             </div>
 
+            {/* Main Insights Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Revenue Chart */}
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="lg:col-span-2 bg-card rounded-2xl p-6 shadow-lg border border-border"
-                >
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
-                                <BarChart3 className="w-5 h-5 text-secondary" />
+                {/* Revenue Momentum Chart */}
+                <Card className="lg:col-span-2 p-6 relative overflow-hidden">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-lg font-black text-foreground flex items-center gap-2">
+                                <Activity className="w-4 h-4 text-primary" />
+                                Revenue Momentum
+                            </h3>
+                            <p className="text-xs text-muted-foreground font-medium">Time-series analysis of daily gross revenue</p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-2 h-2 rounded-full bg-primary-500" />
+                                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Earnings</span>
                             </div>
-                            <h3 className="text-xl font-black text-foreground">Revenue Trend</h3>
                         </div>
                     </div>
-                    <div className="h-[300px] w-full">
+
+                    <div className="h-[340px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={chartData}>
                                 <defs>
-                                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                                    <linearGradient id="colorRevenueAnalytics" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#06B6D4" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
                                 <XAxis
                                     dataKey="name"
-                                    axisLine={false}
+                                    stroke="#475569"
+                                    fontSize={10}
+                                    fontWeight={700}
                                     tickLine={false}
-                                    tick={{ fill: 'var(--muted-foreground)', fontSize: 12, fontWeight: 600 }}
+                                    axisLine={false}
+                                    dy={10}
                                 />
                                 <YAxis
-                                    axisLine={false}
+                                    stroke="#475569"
+                                    fontSize={10}
+                                    fontWeight={700}
                                     tickLine={false}
-                                    tick={{ fill: 'var(--muted-foreground)', fontSize: 12, fontWeight: 600 }}
-                                    tickFormatter={(value) => `₹${value}`}
+                                    axisLine={false}
+                                    tickFormatter={(val) => `₹${val}`}
                                 />
                                 <Tooltip
                                     contentStyle={{
-                                        backgroundColor: 'var(--card)',
-                                        borderColor: 'var(--border)',
-                                        borderRadius: '12px',
-                                        color: 'var(--foreground)',
-                                        fontWeight: 'bold'
+                                        backgroundColor: '#0F172A',
+                                        borderColor: 'rgba(255,255,255,0.1)',
+                                        borderRadius: '16px',
+                                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                                        borderWidth: '1px'
                                     }}
+                                    itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
+                                    labelStyle={{ fontSize: '10px', color: '#64748b', marginBottom: '4px', fontWeight: 'bold' }}
                                 />
-                                <Area type="monotone" dataKey="revenue" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
+                                <Area
+                                    type="monotone"
+                                    dataKey="revenue"
+                                    stroke="#06B6D4"
+                                    strokeWidth={4}
+                                    fillOpacity={1}
+                                    fill="url(#colorRevenueAnalytics)"
+                                    activeDot={{ r: 6, stroke: '#06B6D4', strokeWidth: 2, fill: '#FFFFFF' }}
+                                />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
-                </motion.div>
+                </Card>
 
-                {/* Categories Chart */}
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="bg-card rounded-2xl p-6 shadow-lg border border-border"
-                >
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
-                            <PieChartIcon className="w-5 h-5 text-accent" />
-                        </div>
-                        <h3 className="text-xl font-black text-foreground">Revenue by Category</h3>
+                {/* Contribution Breakdown */}
+                <Card className="p-8 flex flex-col">
+                    <div className="mb-8">
+                        <h3 className="text-lg font-bold text-foreground tracking-tight flex items-center gap-2">
+                            <PieChartIcon className="w-4 h-4 text-purple-600" />
+                            Revenue Contribution
+                        </h3>
+                        <p className="text-xs text-slate-500 font-medium">Distribution by product category</p>
                     </div>
-                    <div className="h-[300px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+
+                    <div className="flex-1 relative min-h-[280px]">
+                        <ResponsiveContainer width="100%" height={280}>
                             <PieChart>
                                 <Pie
                                     data={analyticsData?.revenueByCategory || []}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    paddingAngle={5}
+                                    innerRadius={70}
+                                    outerRadius={95}
+                                    paddingAngle={8}
                                     dataKey="value"
+                                    stroke="none"
                                 >
                                     {(analyticsData?.revenueByCategory || []).map((entry: any, index: number) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
-                                <Tooltip
-                                    contentStyle={{
-                                        backgroundColor: 'var(--card)',
-                                        borderColor: 'var(--border)',
-                                        borderRadius: '12px',
-                                        color: 'var(--foreground)'
-                                    }}
-                                />
+                                <Tooltip />
                             </PieChart>
                         </ResponsiveContainer>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">Top Sector</span>
+                            <span className="text-xl font-black text-foreground">Main Course</span>
+                        </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 mt-4">
+
+                    <div className="space-y-3 pt-6 border-t border-white/5">
                         {(analyticsData?.revenueByCategory || []).map((entry: any, index: number) => (
-                            <div key={index} className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                                <span className="text-xs font-bold text-muted-foreground truncate">{entry.name}</span>
+                            <div key={index} className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                                    <span className="text-xs font-bold text-muted-foreground capitalize">{entry.name}</span>
+                                </div>
+                                <span className="text-xs font-black text-foreground">₹{entry.value.toLocaleString()}</span>
                             </div>
                         ))}
                     </div>
-                </motion.div>
+                </Card>
+            </div>
+
+            {/* Deep Analytics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Hourly Heatmap Preview */}
+                <Card className="p-8">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-lg font-bold text-foreground tracking-tight flex items-center gap-2">
+                                <Zap className="w-4 h-4 text-yellow-600" />
+                                Velocity Insights
+                            </h3>
+                            <p className="text-xs text-muted-foreground font-medium">Peak hours and order velocity mapping</p>
+                        </div>
+                        <Button variant="ghost" size="icon" className="text-slate-500"><MoreHorizontal /></Button>
+                    </div>
+
+                    <div className="grid grid-cols-12 gap-2">
+                        {[...Array(48)].map((_, i) => (
+                            <div
+                                key={i}
+                                className={cn(
+                                    "h-8 rounded-md transition-all duration-500",
+                                    i % 12 > 4 && i % 12 < 9 ? "bg-primary-500/40" :
+                                        i % 12 > 8 ? "bg-primary-500/10" : "bg-white/[0.02]"
+                                )}
+                                title={`Hour ${Math.floor(i / 2)}`}
+                            />
+                        ))}
+                    </div>
+                    <div className="flex justify-between mt-4">
+                        <span className="text-[9px] font-black text-slate-600 uppercase">12 AM</span>
+                        <span className="text-[9px] font-black text-slate-600 uppercase">12 PM</span>
+                        <span className="text-[9px] font-black text-slate-600 uppercase">11 PM</span>
+                    </div>
+                </Card>
+
+                {/* Retention / Activity Timeline */}
+                <Card className="p-8">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-lg font-bold text-foreground tracking-tight flex items-center gap-2">
+                                <Target className="w-4 h-4 text-indigo-600" />
+                                Efficiency Score
+                            </h3>
+                            <p className="text-xs text-muted-foreground font-medium">System performance and service latency</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-6">
+                        {[
+                            { label: 'Order Processing', value: '3.2m', sub: 'Avg prep time', color: 'bg-indigo-500' },
+                            { label: 'Table Turnover', value: '42m', sub: 'Avg stay duration', color: 'bg-purple-500' },
+                            { label: 'Billing Latency', value: '14s', sub: 'Action to payment', color: 'bg-teal-500' },
+                        ].map((item, i) => (
+                            <div key={i} className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-muted-foreground">{item.label}</span>
+                                    <span className="text-sm font-black text-foreground">{item.value}</span>
+                                </div>
+                                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: '70%' }}
+                                        transition={{ duration: 1, delay: i * 0.2 }}
+                                        className={cn("h-full rounded-full", item.color)}
+                                    />
+                                </div>
+                                <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{item.sub}</p>
+                            </div>
+                        ))}
+                    </div>
+                </Card>
             </div>
         </div>
     )

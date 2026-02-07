@@ -121,30 +121,53 @@ export class PaymentService {
      * Create Razorpay Order for Subscription Plan
      */
     async createPlanOrder(tenantId: string, planId: string, billingCycle: 'MONTHLY' | 'YEARLY') {
-        const plan = await prisma.subscriptionPlan.findUnique({
+        console.log(`[DEBUG] createPlanOrder called - tenantId: ${tenantId}, planId: ${planId}, billingCycle: ${billingCycle}`)
+
+        let plan = await prisma.subscriptionPlan.findUnique({
             where: { id: planId },
         })
+        console.log(`[DEBUG] Plan lookup by ID result:`, plan ? 'Found' : 'Not found')
+
+        // Fallback to name/slug lookup if ID not found (matches onboarding slugs)
+        if (!plan) {
+            console.log(`[DEBUG] Attempting fallback name lookup for: ${planId}`)
+            plan = await prisma.subscriptionPlan.findFirst({
+                where: { name: { contains: planId, mode: 'insensitive' } }
+            })
+            console.log(`[DEBUG] Plan lookup by name result:`, plan ? `Found: ${plan.name}` : 'Not found')
+        }
 
         if (!plan) {
-            throw new AppError(404, 'Plan not found')
+            console.error(`[DEBUG] Plan not found for planId: ${planId}`)
+            throw new AppError(404, 'Subscription plan not found')
         }
 
         const amount = billingCycle === 'MONTHLY' ? Number(plan.priceMonthly) : Number(plan.priceYearly)
+        console.log(`[DEBUG] Plan amount: ${amount}`)
 
         if (!this.razorpay) {
+            console.error('[DEBUG] Razorpay not configured!')
             throw new AppError(500, 'Razorpay not configured')
         }
+
+        console.log('[DEBUG] Creating Razorpay order...')
+        // Razorpay receipt max length is 40 chars
+        // Format: rcpt_XXXXXXXX_TTTTTTTTT (rcpt_ + 8 char tenant ID + _ + base36 timestamp)
+        const shortTenantId = tenantId.slice(-8) // Last 8 chars of UUID
+        const shortTimestamp = Date.now().toString(36) // Base36 encoding for shorter timestamp
+        const receipt = `rcpt_${shortTenantId}_${shortTimestamp}` // ~28 chars total
 
         const order = await this.razorpay.orders.create({
             amount: Math.round(amount * 100), // convert to paise
             currency: 'INR',
-            receipt: `rcpt_${tenantId}_${Date.now()}`,
+            receipt,
             notes: {
                 tenantId,
                 planId,
                 billingCycle,
             },
         })
+        console.log('[DEBUG] Razorpay order created successfully:', order.id)
 
         return order
     }

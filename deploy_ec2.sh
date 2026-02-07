@@ -92,8 +92,32 @@ echo "CORS_ORIGIN=https://$DOMAIN" >> .env.tmp
 mv .env.tmp .env
 
 # 7. Run Docker Compose
-echo -e "${GREEN}[6/6] Launching application with Docker Compose...${NC}"
+echo -e "${GREEN}[6/7] Launching application with Docker Compose...${NC}"
 sudo docker compose up -d --build
+
+# Wait for services to be ready
+echo -e "${GREEN}Waiting for services to start...${NC}"
+sleep 15
+
+# 8. Setup Production Tenant
+echo -e "${GREEN}[7/7] Setting up production tenant with menu items...${NC}"
+if [ -f "./backend/setup_production_tenant.sh" ]; then
+    # Set the backend URL to use the domain
+    export BACKEND_URL="https://$DOMAIN"
+    
+    # Run the tenant setup script
+    cd backend
+    chmod +x setup_production_tenant.sh
+    ./setup_production_tenant.sh
+    cd ..
+    
+    echo -e "${GREEN}✅ Production tenant created successfully!${NC}"
+    echo -e "${BLUE}Login credentials:${NC}"
+    echo -e "  Email: hello@ambrane.com"
+    echo -e "  Password: 1@AmbraneLabs"
+else
+    echo -e "${BLUE}⚠️  Tenant setup script not found. Skipping tenant creation.${NC}"
+fi
 
 echo -e "${BLUE}=== Deployment Complete! ===${NC}"
 echo -e "Your application should now be accessible at: ${GREEN}https://$DOMAIN${NC}"

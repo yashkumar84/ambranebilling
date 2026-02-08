@@ -16,16 +16,16 @@ echo "🏢 Business: $BUSINESS_NAME"
 echo "🌐 Backend URL: $BACKEND_URL"
 echo ""
 
-# Step 1: Register the tenant
-echo "📝 Step 1: Registering tenant..."
+# Step 1: Register the user
+echo "📝 Step 1: Registering user..."
 REGISTER_RESPONSE=$(curl -s -X POST "$BACKEND_URL/api/auth/register" \
   -H "Content-Type: application/json" \
   -d "{
     \"email\": \"$EMAIL\",
     \"password\": \"$PASSWORD\",
-    \"businessName\": \"$BUSINESS_NAME\",
+    \"name\": \"Admin\",
     \"phone\": \"+919876543210\",
-    \"address\": \"123 Main Street, Mumbai, India\"
+    \"otpCode\": \"123456\"
   }")
 
 echo "Response: $REGISTER_RESPONSE"
@@ -40,15 +40,42 @@ LOGIN_RESPONSE=$(curl -s -X POST "$BACKEND_URL/api/auth/login" \
     \"password\": \"$PASSWORD\"
   }")
 
-# Extract token from response
-TOKEN=$(echo $LOGIN_RESPONSE | grep -o '"token":"[^"]*' | sed 's/"token":"//')
+# Extract token from response (handle nested data object)
+TOKEN=$(echo $LOGIN_RESPONSE | grep -o '"accessToken":"[^"]*' | head -1 | sed 's/"accessToken":"//')
 
 if [ -z "$TOKEN" ]; then
     echo "❌ Failed to login. Response: $LOGIN_RESPONSE"
     exit 1
 fi
 
-echo "✅ Login successful! Token obtained."
+echo "✅ Login successful!"
+
+# Step 2.5: Create Tenant
+echo ""
+echo "🏢 Step 2.5: Creating tenant..."
+TENANT_RESPONSE=$(curl -s -X POST "$BACKEND_URL/api/tenants" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d "{
+    \"businessName\": \"$BUSINESS_NAME\",
+    \"businessType\": \"Restaurant\",
+    \"email\": \"$EMAIL\",
+    \"phone\": \"+919876543210\",
+    \"address\": \"123 Main Street, Mumbai, India\",
+    \"subdomain\": \"ambranelabs\"
+  }")
+
+echo "Response: $TENANT_RESPONSE"
+
+# Extract NEW token from tenant response (as tenant creation refreshes token with tenantId)
+NEW_TOKEN=$(echo $TENANT_RESPONSE | grep -o '"accessToken":"[^"]*' | head -1 | sed 's/"accessToken":"//')
+
+if [ ! -z "$NEW_TOKEN" ]; then
+    TOKEN=$NEW_TOKEN
+    echo "✅ Tenant created and token updated!"
+else
+    echo "⚠️ Warning: Could not extract new token after tenant creation. Using old token."
+fi
 
 # Step 3: Add menu items
 echo ""

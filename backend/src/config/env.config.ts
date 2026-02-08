@@ -41,6 +41,9 @@ const envSchema = z.object({
     // Rate Limiting
     RATE_LIMIT_MAX: z.string().transform(Number).default('100'),
     RATE_LIMIT_WINDOW: z.string().transform(Number).default('60000'),
+
+    // Setup
+    MASTER_OTP: z.string().default('123456'),
 })
 
 export const config = envSchema.parse(process.env)

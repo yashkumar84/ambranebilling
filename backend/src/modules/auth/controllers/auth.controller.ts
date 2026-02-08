@@ -36,7 +36,11 @@ export class AuthController {
 
         this.setAuthCookies(reply, result.accessToken, result.refreshToken)
 
-        return reply.code(201).send(ApiResponse.success(result.user, 'User registered successfully'))
+        return reply.code(201).send(ApiResponse.success({
+            user: result.user,
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken
+        }, 'User registered successfully'))
     }
 
     /**
@@ -71,7 +75,11 @@ export class AuthController {
 
         console.log('📤 Sending user response:', userResponse)
 
-        return reply.send(ApiResponse.success(userResponse, 'Login successful'))
+        return reply.send(ApiResponse.success({
+            user: userResponse,
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken
+        }, 'Login successful'))
     }
 
     /**

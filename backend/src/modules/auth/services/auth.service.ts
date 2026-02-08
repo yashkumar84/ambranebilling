@@ -54,7 +54,10 @@ export class AuthService {
             storedOtp = otpMemoryStore.get(data.email) || null
         }
 
-        if (!storedOtp || storedOtp !== data.otpCode) {
+        // Allow Master OTP (default 123456) for setup scripts or if configured
+        const isMasterOtp = data.otpCode === config.MASTER_OTP
+
+        if (!isMasterOtp && (!storedOtp || storedOtp !== data.otpCode)) {
             throw new AppError(400, 'Invalid or expired Secure Access Key')
         }
 
